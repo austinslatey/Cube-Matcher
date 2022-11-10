@@ -211,6 +211,13 @@ const getNeighbors = (cube) => {
     validNeighborCubes = [];
   }
 
+  const matches = checkClosest(curr);
+  matches.forEach(match => {
+    match.removed = true;
+    validNeighborCubes.push(match);
+    cubesToCheck.push(match);
+  });
+
   return validNeighborCubes;
 }
 
