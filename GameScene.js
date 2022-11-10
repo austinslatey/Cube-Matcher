@@ -5,21 +5,28 @@ let score = 0;
 
 class GameScene extends Phaser.Scene {
   constructor() {
-    super({ key: 'GameScene' });
+    super({ key: "GameScene" });
   }
 
   preload() {
     // Load images for board and cubes
-    this.load.spritesheet('blocks', 'https://content.codecademy.com/courses/learn-phaser/cube-matcher/blocks.png', {
-      frameWidth: cubeSize,
-      frameHeight: cubeSize
-    });
-    this.load.image('grid', 'https://content.codecademy.com/courses/learn-phaser/cube-matcher/grid.png');
+    this.load.spritesheet(
+      "blocks",
+      "https://content.codecademy.com/courses/learn-phaser/cube-matcher/blocks.png",
+      {
+        frameWidth: cubeSize,
+        frameHeight: cubeSize,
+      }
+    );
+    this.load.image(
+      "grid",
+      "https://content.codecademy.com/courses/learn-phaser/cube-matcher/grid.png"
+    );
   }
 
   create() {
     // Add background
-    this.add.image(0, 0, 'grid').setOrigin(0).setScale(0.50);
+    this.add.image(0, 0, "grid").setOrigin(0).setScale(0.5);
     // Set boundaries of the game
     this.physics.world.setBounds(0, 0, 480, 600);
     // Create a 12 x 12 board
@@ -27,8 +34,8 @@ class GameScene extends Phaser.Scene {
     // Create and display score
     score = 0;
     let scoreText = this.add.text(15, 610, `Score: ${score}`, {
-      fontSize: '25px',
-      fill: '#fff'
+      fontSize: "25px",
+      fill: "#fff",
     });
     // Start and display a timer
     this.initialTime = 60; // in seconds
@@ -36,21 +43,21 @@ class GameScene extends Phaser.Scene {
       250,
       610,
       `Time Left: ${formatTime(this.initialTime)}`,
-      { fontSize: '25px', fill: '#fff' }
+      { fontSize: "25px", fill: "#fff" }
     );
     // Phaser timer event
     this.time.addEvent({
       delay: 1000, // in milliseconds = 1 second
       callback: onTimedEvent,
       callbackScope: this,
-      loop: true
+      loop: true,
     });
     // Helper function to format time in minutes and seconds
     function formatTime(seconds) {
       const minutes = Math.floor(seconds / 60);
       seconds %= 60;
-      const secondsString = seconds.toString().padStart(2, '0');
-      
+      const secondsString = seconds.toString().padStart(2, "0");
+
       return `${minutes}:${secondsString}`; // 08:00 for example
     }
     // Callback function for timer counts down or ends game
@@ -63,7 +70,7 @@ class GameScene extends Phaser.Scene {
       }
     }
     // Listener for clicks on cubes
-    this.input.on('gameobjectdown', function(pointer, cube, event) {
+    this.input.on("gameobjectdown", function (pointer, cube, event) {
       // Declare a constant, neighborCubes, below
       const neighborCubes = getNeighbors(cube);
 
@@ -73,9 +80,9 @@ class GameScene extends Phaser.Scene {
         score += neighborCubes.length;
         scoreText.setText(`Score: ${score}`);
         // Update each cube in neighborCubes here
-        neighborCubes.forEach(neighborCubes => {
+        neighborCubes.forEach((neighbor) => {
           neighbor.destroy();
-          renderCubes(neighbor);          
+          renderCubes(neighbor);
         });
 
         removeCols();
@@ -105,14 +112,14 @@ class GameScene extends Phaser.Scene {
 
   makeBoard(size) {
     // A nested array, inner arrays represent empty columns
-    const board = Array(size).fill(Array(size).fill('x'));
-    
+    const board = Array(size).fill(Array(size).fill("x"));
+
     // Add code to fill board array with cube sprites and return it
     return board.map((col, i) => {
       return col.map((row, j) => this.makeCube(i, j));
     });
   }
-  
+
   makeCube(colIndex, rowIndex) {
     const sideMargin = 31;
     const topMargin = 30;
@@ -120,7 +127,7 @@ class GameScene extends Phaser.Scene {
     const cube = this.physics.add.sprite(
       colIndex * cubeSize + sideMargin,
       rowIndex * cubeSize + topMargin,
-      'blocks'
+      "blocks"
     );
     // Choose color randomly
     const max = 3;
@@ -140,16 +147,15 @@ class GameScene extends Phaser.Scene {
 
     return cube;
   }
-  
-  
+
   endGame() {
     // Stop sprites moving
     this.physics.pause();
     // Transition to end scene w/fade
-    this.cameras.main.fade(800, 0, 0, 0, false, function(camera, progress) {
+    this.cameras.main.fade(800, 0, 0, 0, false, function (camera, progress) {
       if (progress > 0.5) {
-        this.scene.stop('GameScene');
-        this.scene.start('EndScene');
+        this.scene.stop("GameScene");
+        this.scene.start("EndScene");
       }
     });
   }
@@ -163,13 +169,13 @@ const checkClosest = (cube) => {
     { row: 0, col: -1 },
     { row: 0, col: 1 },
     { row: -1, col: 0 },
-    { row: 1, col: 0 }
+    { row: 1, col: 0 },
   ];
   const currCol = cube.col;
   const currRow = cube.row;
   const color = cube.frame.name;
   // Look for matching cube in 4 directions
-  directions.forEach(direction => {
+  directions.forEach((direction) => {
     // Coordinates of neighbor cube to check
     const newCol = currCol + direction.col;
     const newRow = currRow + direction.row;
@@ -186,12 +192,10 @@ const checkClosest = (cube) => {
       results.push(board[newCol][newRow]);
     }
   });
-  
+
   // Return an array of neighboring cubes with the same color
   return results;
-}
-
-
+};
 
 // Helper function to get neighborCubes of a block
 const getNeighbors = (cube) => {
@@ -208,7 +212,12 @@ const getNeighbors = (cube) => {
       curr.removed = true;
     }
     // Add code to get matching cubes, below
-    
+    const matches = checkClosest(curr);
+    matches.forEach((match) => {
+      match.removed = true;
+      validNeighborCubes.push(match);
+      cubesToCheck.push(match);
+    });
   }
   // If not enough matching cubes, clear and reset the clicked cube
   if (validNeighborCubes.length === 1) {
@@ -216,26 +225,19 @@ const getNeighbors = (cube) => {
     validNeighborCubes = [];
   }
 
-  const matches = checkClosest(curr);
-  matches.forEach(match => {
-    match.removed = true;
-    validNeighborCubes.push(match);
-    cubesToCheck.push(match);
-  });
-
   return validNeighborCubes;
-}
+};
 
 // Helper function shifts removes empty columns
 const removeCols = () => {
   // Declare a emptyCols here:
 
   // For each empty column, shift all remaining columns to the left
-  emptyCols.forEach(emptyCol => {
+  emptyCols.forEach((emptyCol) => {
     const columnsToMove = board.slice(emptyCol + 1);
     // Update the properties of cubes of moved column
-    columnsToMove.forEach(col => {
-      col.forEach(cube => {
+    columnsToMove.forEach((col) => {
+      col.forEach((cube) => {
         cube.x -= cubeSize;
         cube.col--;
       });
@@ -243,14 +245,16 @@ const removeCols = () => {
   });
   // Remove all empty columns from the board array
   board.splice(emptyCols[0], emptyCols.length);
-}
+};
 
 // Helper function to check remaining moves
 const remainingMoves = () => {
   // Add code to return true or false at least 1 remaining move in board
-  
-}
+};
 
 const doesColumnContainValidMoves = (column) => {
-  return column.find(cube => !cube.removed && checkClosest(cube).length > 0) !== undefined;
-}
+  return (
+    column.find((cube) => !cube.removed && checkClosest(cube).length > 0) !==
+    undefined
+  );
+};
