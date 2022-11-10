@@ -231,7 +231,10 @@ const getNeighbors = (cube) => {
 // Helper function shifts removes empty columns
 const removeCols = () => {
   // Declare a emptyCols here:
-
+  const emptyCols = board.map((col, i) => {
+    const isEmpty = col.every(cube => cube.removed);
+    return isEmpty ? i : false;
+  }).filter(value => value !== false);
   // For each empty column, shift all remaining columns to the left
   emptyCols.forEach((emptyCol) => {
     const columnsToMove = board.slice(emptyCol + 1);
