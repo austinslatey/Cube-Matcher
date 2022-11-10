@@ -65,6 +65,7 @@ class GameScene extends Phaser.Scene {
     // Listener for clicks on cubes
     this.input.on('gameobjectdown', function(pointer, cube, event) {
       // Declare a constant, neighborCubes, below
+      const neighborCubes = getNeighbors(cube);
 
       // Remove matching cubes from game if there's at least 2 of them
       if (neighborCubes.length > 0) {
@@ -72,6 +73,10 @@ class GameScene extends Phaser.Scene {
         score += neighborCubes.length;
         scoreText.setText(`Score: ${score}`);
         // Update each cube in neighborCubes here
+        neighborCubes.forEach(neighborCubes => {
+          neighbor.destroy();
+          renderCubes(neighbor);          
+        });
 
         removeCols();
       }
