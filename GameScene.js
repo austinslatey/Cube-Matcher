@@ -253,7 +253,7 @@ const removeCols = () => {
 // Helper function to check remaining moves
 const remainingMoves = () => {
   // Add code to return true or false at least 1 remaining move in board
-  return board.some(col => !cube.removed && doesColumnContainValidMoves(col));
+  return board.some(col => doesColumnContainValidMoves(col));
 };
 
 const doesColumnContainValidMoves = (column) => {
